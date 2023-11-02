@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.name }}
+  annotations:
+    secret.reloader.stakater.com/reload: {{ .Values.secret.name }}
+spec:
+  replicas: {{ .Values.replicas }}
+  selector:
+    matchLabels:
+      app: {{ .Values.name }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.name }}
+    spec:
+      containers:
+        - name: {{ .Values.name }}
+          image: {{ .Values.container.image }}:{{ .Values.container.version }}
+          resources:
+            requests:
+              memory: {{ .Values.resources.requestMemory }}
+            limits:
+              memory: {{ .Values.resources.limitMemory }}
+          ports:
+            - containerPort: {{ .Values.container.port }}
+          envFrom:
+            - secretRef: 
+                name: {{ .Values.secret.name }}
+          env:
+            - name: PORT
+              value: '{{ .Values.container.port }}'

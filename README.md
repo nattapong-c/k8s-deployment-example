@@ -1,0 +1,1 @@
+helm install <name> -n <namespace> -f <file-config> apps/demo

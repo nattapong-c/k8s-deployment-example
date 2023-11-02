@@ -1,0 +1,18 @@
+apiVersion: keda.sh/v1alpha1
+kind: ScaledObject
+metadata:
+  name: {{ .Values.name }}
+spec:
+  scaleTargetRef:
+    name: {{ .Values.name }}
+  pollingInterval: {{ .Values.scale.pollingInterval }}
+  cooldownPeriod: {{ .Values.scale.cooldownPeriod }}
+  minReplicaCount: {{ .Values.scale.replicaCount.min }}
+  maxReplicaCount: {{ .Values.scale.replicaCount.max }}
+  triggers:
+    - type: prometheus
+      metadata:
+        serverAddress: {{ .Values.prometheus.host }}
+        metricName: krakend_opencensus_io_http_client_completed_count
+        threshold: '{{ .Values.scale.threshold }}'
+        query: sum(rate(krakend_opencensus_io_http_client_completed_count{http_client_host="{{ .Values.service.name }}"}[{{ .Values.scale.refresh }}]))
